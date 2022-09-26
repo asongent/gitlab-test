@@ -22,42 +22,22 @@
 #     repoURL: https://charts.gitlab.io/  #https://gitlab.com/gitlab-org/charts/gitlab
 #     targetRevision:  6.3.3
 
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: gritlab
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/asongent/gitlab-test.git
-    targetRevision: HEAD
-    path: gitlab
-    helm:
-      valueFiles:
-      - values.yaml
-        --timeout 600s
-  destination:
-    namespace: gitlab
-    server: https://kubernetes.default.svc
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-
 # ---
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
-#   name: gitlab-runner
+#   name: gritlab
 #   namespace: argocd
 # spec:
 #   project: default
 #   source:
 #     repoURL: https://github.com/asongent/gitlab-test.git
 #     targetRevision: HEAD
-#     path: gitlab-runner
+#     path: gitlab
+#     helm:
+#       valueFiles:
+#       - values.yaml
+#         --timeout 600s
 #   destination:
 #     namespace: gitlab
 #     server: https://kubernetes.default.svc
@@ -65,6 +45,26 @@ spec:
 #     automated:
 #       prune: true
 #       selfHeal: true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/asongent/gitlab-test.git
+    targetRevision: HEAD
+    path: deployment
+  destination:
+    namespace: gitlab
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
 
 # --- 
 # apiVersion: argoproj.io/v1alpha1
