@@ -13,6 +13,12 @@ spec:
     helm:
       valueFiles:
       - values.yaml
+        --timeout 600s
+        --set global.hosts.domain=localhost \
+        --set global.hosts.https=true \
+        --set certmanager.install=false \
+        --set global.ingress.configureCertmanager=false \
+        --set global.ingress.tls.secretName=gitlab-tls \
     repoURL: https://charts.gitlab.io/  #https://gitlab.com/gitlab-org/charts/gitlab
     targetRevision:  6.3.3
 
