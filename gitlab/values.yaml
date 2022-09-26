@@ -21,29 +21,29 @@ redis:
       storageClass: hostpath
       size: 5Gi
 
-# # Addtional config
-# global:
-#   common:
-#     labels: {}
-# ##Host
-#   hosts:
-#       domain: localhost
+# Addtional config
+global:
+  common:
+    labels: {}
+##Host
+  hosts:
+      domain: localhost
 
-#   #Ingress
-#   ingress:
-#     configureCertmanager: false
-#     provider: nginx
-#       # class:
-#     annotations: {}
-#     enabled: true
-#     tls: 
-#       enabled: true
-#       secretName: gitlab-tls
-#     path: /
-#     pathType: Prefix
+  #Ingress
+  ingress:
+    configureCertmanager: false
+    provider: nginx
+      # class:
+    annotations: {}
+    enabled: true
+    tls: 
+      enabled: true
+      secretName: gitlab-tls
+    path: /
+    pathType: Prefix
 
-#   certmanager:
-#     install: true
+  certmanager:
+    install: true
 
 
 # helm install gitlab gitlab/gitlab --namespace gitlab \

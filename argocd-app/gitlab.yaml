@@ -1,49 +1,50 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: gitlab
+#   namespace: argocd
+# spec:
+#   destination:
+#     namespace: gitlab
+#     server: https://kubernetes.default.svc
+#   project: default
+#   source:
+#     chart: gitlab
+#     helm:
+#       valueFiles:
+#       - values.yaml
+#         --timeout 600s
+#         --set global.hosts.domain=localhost \
+#         --set global.hosts.https=true \
+#         --set certmanager.install=false \
+#         --set global.ingress.configureCertmanager=false \
+#         --set global.ingress.tls.secretName=gitlab-tls \
+#     repoURL: https://charts.gitlab.io/  #https://gitlab.com/gitlab-org/charts/gitlab
+#     targetRevision:  6.3.3
+
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gitlab
+  name: gritlab
   namespace: argocd
 spec:
-  destination:
-    namespace: gitlab
-    server: https://kubernetes.default.svc
   project: default
   source:
-    chart: gitlab
+    repoURL: https://github.com/asongent/gitlab-test.git
+    targetRevision: HEAD
+    path: gitlab
     helm:
       valueFiles:
       - values.yaml
         --timeout 600s
-        --set global.hosts.domain=localhost \
-        --set global.hosts.https=true \
-        --set certmanager.install=false \
-        --set global.ingress.configureCertmanager=false \
-        --set global.ingress.tls.secretName=gitlab-tls \
-    repoURL: https://charts.gitlab.io/  #https://gitlab.com/gitlab-org/charts/gitlab
-    targetRevision:  6.3.3
-
-# ---
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: gritlab
-#   namespace: argocd
-# spec:
-#   project: default
-#   source:
-#     repoURL: https://github.com/asongent/gitlab-test.git
-#     targetRevision: HEAD
-#     path: gitlab
-#     helm:
-#       valueFiles:
-#       - values.yaml
-#   destination:
-#     namespace: gitlab
-#     server: https://kubernetes.default.svc
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
+  destination:
+    namespace: gitlab
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
 
 # ---
 # apiVersion: argoproj.io/v1alpha1
@@ -122,3 +123,4 @@ spec:
 #     automated:
 #       prune: true
 #       selfHeal: true
+
