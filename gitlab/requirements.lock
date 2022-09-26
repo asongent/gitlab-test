@@ -22,15 +22,15 @@ dependencies:
   version: 8.9.4
 - name: gitlab-runner
   repository: https://charts.gitlab.io/
-  version: 0.41.0
+  version: 0.43.1
 - name: grafana
   repository: https://grafana.github.io/helm-charts
-  version: 6.9.1
+  version: 6.11.0
 - name: redis
   repository: https://raw.githubusercontent.com/bitnami/charts/eb5f9a9513d987b519f0ecd732e7031241c50328/bitnami
   version: 11.3.4
 - name: nginx-ingress
   repository: ""
   version: '*.*.*'
-digest: sha256:427a88f8a7922d81e1e7008abf9f40d8f2a9cfa8d9db664e124fc40817073940
-generated: "2022-06-02T15:41:03.408286+02:00"
+digest: sha256:69c8f04e3b1cac1f24bb2557ecf6e43b2c0237f84a41e262bd195acdad34c74f
+generated: "2022-09-05T12:06:38.594259951Z"

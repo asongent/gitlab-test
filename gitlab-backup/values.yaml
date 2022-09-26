@@ -1,0 +1,56 @@
+gitlab:
+  gitaly:
+    persistence:
+      storageClass: hostpath
+      size: 20Gi
+postgresql:
+  persistence:
+    storageClass: hostpath
+    size: 8Gi
+minio:
+  persistence:
+    storageClass: hostpath
+    size: 10Gi
+prometheus:
+  persistence:
+    storageClass: hostpath
+    size: 10Gi
+redis:
+  master:
+    persistence:
+      storageClass: hostpath
+      size: 5Gi
+
+# Addtional config
+global:
+  common:
+    labels: {}
+##Host
+  hosts:
+      domain: localhost
+
+  #Ingress
+  ingress:
+    configureCertmanager: false
+    provider: nginx
+      # class:
+    annotations: {}
+    enabled: true
+    tls: 
+      enabled: true
+      secretName: gitlab-tls
+    path: /
+    pathType: Prefix
+
+  certmanager:
+    install: true
+
+
+# helm upgrade --install gitlab gitlab/gitlab --namespace gitlab \
+# --timeout 600s \
+# --set global.hosts.domain=locahost\
+# --set global.hosts.https=true \
+# --set certmanager.install=false \
+# --set global.ingress.configureCertmanager=false \
+# --set global.ingress.tls.secretName=gitlab-tls \
+# -f values.yaml --version 4.9.6
