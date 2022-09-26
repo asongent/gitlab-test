@@ -4,7 +4,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-gitaly
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitaly
     chart: gitaly-6.3.3
@@ -23,7 +23,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-gitlab-shell
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -42,7 +42,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -61,7 +61,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-sidekiq-all-in-1-v1
-  namespace: default
+  namespace: gitlab
   labels:
     app: sidekiq
     chart: sidekiq-6.3.3
@@ -82,7 +82,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-webservice-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -105,7 +105,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-minio-v1
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -136,7 +136,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-controller
-  namespace: default
+  namespace: gitlab
 spec:
   selector:
     matchLabels:
@@ -150,7 +150,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: release-name-registry-v1
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -170,7 +170,7 @@ kind: ServiceAccount
 automountServiceAccountToken: true
 metadata:
   name: release-name-certmanager-cainjector
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: cainjector
     app.kubernetes.io/name: cainjector
@@ -186,7 +186,7 @@ kind: ServiceAccount
 automountServiceAccountToken: true
 metadata:
   name: release-name-certmanager
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: certmanager
     app.kubernetes.io/name: certmanager
@@ -202,7 +202,7 @@ kind: ServiceAccount
 automountServiceAccountToken: true
 metadata:
   name: release-name-certmanager-webhook
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: webhook
     app.kubernetes.io/name: webhook
@@ -240,7 +240,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress
-  namespace: default
+  namespace: gitlab
 automountServiceAccountToken: true
 ---
 # Source: gitlab/charts/prometheus/templates/server/serviceaccount.yaml
@@ -254,7 +254,7 @@ metadata:
     chart: prometheus-15.0.4
     heritage: Helm
   name: release-name-prometheus-server
-  namespace: default
+  namespace: gitlab
   annotations:
     {}
 ---
@@ -263,7 +263,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-runner
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: release-name-gitlab-runner
     chart: gitlab-runner-0.43.1
@@ -391,7 +391,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitaly
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitaly
     chart: gitaly-6.3.3
@@ -452,7 +452,7 @@ data:
     # location of shared secret for GitLab Shell / API interaction
     secret_file = "/etc/gitlab-secrets/shell/.gitlab_shell_secret"
     # URL of API
-    url = "http://release-name-webservice-default.default.svc:8181/"
+    url = "http://release-name-webservice-default.gitlab.svc:8181/"
 
     [gitlab.http-settings]
     # read_timeout = 300
@@ -470,7 +470,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-exporter
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-exporter
     chart: gitlab-exporter-6.3.3
@@ -490,7 +490,7 @@ data:
         methods:
           - probe_db
         opts:
-          connection_string: dbname=gitlabhq_production user=gitlab host=release-name-postgresql.default.svc port=5432 password='<%= File.read('/etc/gitlab/postgres/psql-password-main').strip.gsub(/[\'\\]/) { |esc| '\\' + esc } %>'
+          connection_string: dbname=gitlabhq_production user=gitlab host=release-name-postgresql.gitlab.svc port=5432 password='<%= File.read('/etc/gitlab/postgres/psql-password-main').strip.gsub(/[\'\\]/) { |esc| '\\' + esc } %>'
       database:
         multiple: true
         ci_builds:
@@ -513,7 +513,7 @@ data:
           - probe_retries
           - probe_stats
         opts:
-          redis_url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+          redis_url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
           redis_enable_client: false
 
       ruby: &ruby
@@ -561,7 +561,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-shell-sshd
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -721,7 +721,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-shell
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -752,7 +752,7 @@ data:
     user: git
 
     # Url to gitlab instance. Used for api calls. Should end with a slash.
-    gitlab_url: "http://release-name-webservice-default.default.svc:8181/"
+    gitlab_url: "http://release-name-webservice-default.gitlab.svc:8181/"
 
     secret_file: /etc/gitlab-secrets/shell/.gitlab_shell_secret
 
@@ -778,7 +778,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-nginx-ingress-tcp
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -786,14 +786,14 @@ metadata:
     heritage: Helm
     
 data:
-  "22": "default/release-name-gitlab-shell:22::"
+  "22": "gitlab/release-name-gitlab-shell:22::"
 ---
 # Source: gitlab/charts/gitlab/charts/kas/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -816,7 +816,7 @@ data:
         address: :8153
         authentication_secret_file: /etc/kas/.gitlab_kas_secret
     gitlab:
-      address: http://release-name-webservice-default.default.svc:8181
+      address: http://release-name-webservice-default.gitlab.svc:8181
       authentication_secret_file: /etc/kas/.gitlab_kas_secret
     observability:
       listen:
@@ -828,14 +828,14 @@ data:
     redis:
       password_file: /etc/kas/redis/redis-password
       server:
-        address: release-name-redis-master.default.svc:6379
+        address: release-name-redis-master.gitlab.svc:6379
 ---
 # Source: gitlab/charts/gitlab/charts/migrations/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-migrations
-  namespace: default
+  namespace: gitlab
   labels:
     app: migrations
     chart: migrations-6.3.3
@@ -855,7 +855,7 @@ data:
         database: gitlabhq_production
         username: gitlab
         password: <%= File.read('/etc/gitlab/postgres/psql-password-main').strip.to_json %>
-        host: "release-name-postgresql.default.svc"
+        host: "release-name-postgresql.gitlab.svc"
         port: 5432
         connect_timeout: 
         keepalives: 
@@ -870,7 +870,7 @@ data:
         
   resque.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
   
@@ -878,7 +878,7 @@ data:
   
   cable.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
       adapter: redis
@@ -896,7 +896,7 @@ data:
         storages: # You must have at least a `default` storage path.
           default:
             path: /var/opt/gitlab/repo
-            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.default.svc:8075
+            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.gitlab.svc:8075
           
       
       sidekiq:
@@ -926,7 +926,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-sidekiq
-  namespace: default
+  namespace: gitlab
   labels:
     app: sidekiq
     chart: sidekiq-6.3.3
@@ -945,7 +945,7 @@ data:
         database: gitlabhq_production
         username: gitlab
         password: <%= File.read('/etc/gitlab/postgres/psql-password-main').strip.to_json %>
-        host: "release-name-postgresql.default.svc"
+        host: "release-name-postgresql.gitlab.svc"
         port: 5432
         connect_timeout: 
         keepalives: 
@@ -962,7 +962,7 @@ data:
     
   resque.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
   
@@ -970,7 +970,7 @@ data:
   
   cable.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
       adapter: redis
@@ -1026,7 +1026,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1040,7 +1040,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1054,7 +1054,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1068,7 +1068,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1124,7 +1124,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1137,7 +1137,7 @@ data:
       registry:
         enabled: true
         host: registry.localhost
-        api_url: http://release-name-registry.default.svc:5000
+        api_url: http://release-name-registry.gitlab.svc:5000
         key: /etc/gitlab/registry/gitlab-registry.key
         issuer: gitlab-issuer
         notification_secret: <%= YAML.load_file("/etc/gitlab/registry/notificationSecret").flatten.first %>
@@ -1164,7 +1164,7 @@ data:
         storages: # You must have at least a `default` storage path.
           default:
             path: /var/opt/gitlab/repo
-            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.default.svc:8075
+            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.gitlab.svc:8075
           
       backup:
         path: "tmp/backups"   # Relative paths are relative to Rails.root (default: tmp/backups/)
@@ -1172,7 +1172,7 @@ data:
         enabled: true
         secret_file: /etc/gitlab/kas/.gitlab_kas_secret
         external_url: "wss://kas.localhost"
-        internal_url: "grpc://release-name-kas.default.svc:8153"
+        internal_url: "grpc://release-name-kas.gitlab.svc:8153"
       gitlab_shell:
         path: /home/git/gitlab-shell/
         hooks_path: /home/git/gitlab-shell/hooks/
@@ -1218,7 +1218,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-toolbox
-  namespace: default
+  namespace: gitlab
   labels:
     app: toolbox
     chart: toolbox-6.3.3
@@ -1235,7 +1235,7 @@ data:
         database: gitlabhq_production
         username: gitlab
         password: <%= File.read('/etc/gitlab/postgres/psql-password-main').strip.to_json %>
-        host: "release-name-postgresql.default.svc"
+        host: "release-name-postgresql.gitlab.svc"
         port: 5432
         connect_timeout: 
         keepalives: 
@@ -1252,7 +1252,7 @@ data:
     
   resque.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
   
@@ -1260,7 +1260,7 @@ data:
   
   cable.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
       adapter: redis
@@ -1306,7 +1306,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1320,7 +1320,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1334,7 +1334,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1348,7 +1348,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1398,7 +1398,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1411,7 +1411,7 @@ data:
       registry:
         enabled: true
         host: registry.localhost
-        api_url: http://release-name-registry.default.svc:5000
+        api_url: http://release-name-registry.gitlab.svc:5000
         key: /etc/gitlab/registry/gitlab-registry.key
         issuer: gitlab-issuer
         notification_secret: <%= YAML.load_file("/etc/gitlab/registry/notificationSecret").flatten.first %>
@@ -1438,7 +1438,7 @@ data:
         storages: # You must have at least a `default` storage path.
           default:
             path: /var/opt/gitlab/repo
-            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.default.svc:8075
+            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.gitlab.svc:8075
           
       backup:
         path: "tmp/backups"   # Relative paths are relative to Rails.root (default: tmp/backups/)
@@ -1446,7 +1446,7 @@ data:
         enabled: true
         secret_file: /etc/gitlab/kas/.gitlab_kas_secret
         external_url: "wss://kas.localhost"
-        internal_url: "grpc://release-name-kas.default.svc:8153"
+        internal_url: "grpc://release-name-kas.gitlab.svc:8153"
       gitlab_shell:
         path: /home/git/gitlab-shell/
         hooks_path: /home/git/gitlab-shell/hooks/
@@ -1519,7 +1519,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-webservice
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -1538,7 +1538,7 @@ data:
         database: gitlabhq_production
         username: gitlab
         password: <%= File.read('/etc/gitlab/postgres/psql-password-main').strip.to_json %>
-        host: "release-name-postgresql.default.svc"
+        host: "release-name-postgresql.gitlab.svc"
         port: 5432
         connect_timeout: 
         keepalives: 
@@ -1555,7 +1555,7 @@ data:
     
   resque.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
   
@@ -1563,7 +1563,7 @@ data:
   
   cable.yml.erb: |
     production:
-      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.default.svc:6379
+      url: redis://:<%= ERB::Util::url_encode(File.read("/etc/gitlab/redis/redis-password").strip) %>@release-name-redis-master.gitlab.svc:6379
       
       id:
       adapter: redis
@@ -1619,7 +1619,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1633,7 +1633,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1647,7 +1647,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1661,7 +1661,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1719,7 +1719,7 @@ data:
             provider: AWS
             region: us-east-1
             host: minio.localhost
-            endpoint: http://release-name-minio-svc.default.svc:9000
+            endpoint: http://release-name-minio-svc.gitlab.svc:9000
             path_style: true
             aws_access_key_id: <%= File.read('/etc/gitlab/minio/accesskey').strip.to_json %>
             aws_secret_access_key: <%= File.read('/etc/gitlab/minio/secretkey').strip.to_json %>
@@ -1751,7 +1751,7 @@ data:
         storages: # You must have at least a `default` storage path.
           default:
             path: /var/opt/gitlab/repo
-            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.default.svc:8075
+            gitaly_address: tcp://release-name-gitaly-0.release-name-gitaly.gitlab.svc:8075
           
       backup:
         path: "tmp/backups"   # Relative paths are relative to Rails.root (default: tmp/backups/)
@@ -1759,7 +1759,7 @@ data:
         enabled: true
         secret_file: /etc/gitlab/kas/.gitlab_kas_secret
         external_url: "wss://kas.localhost"
-        internal_url: "grpc://release-name-kas.default.svc:8153"
+        internal_url: "grpc://release-name-kas.gitlab.svc:8153"
       gitlab_shell:
         path: /home/git/gitlab-shell/
         hooks_path: /home/git/gitlab-shell/hooks/
@@ -1788,7 +1788,7 @@ data:
       registry:
         enabled: true
         host: registry.localhost
-        api_url: http://release-name-registry.default.svc:5000
+        api_url: http://release-name-registry.gitlab.svc:5000
         key: /etc/gitlab/registry/gitlab-registry.key
         issuer: gitlab-issuer
         notification_secret: <%= YAML.load_file("/etc/gitlab/registry/notificationSecret").flatten.first %>
@@ -1820,7 +1820,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-workhorse-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -1833,7 +1833,7 @@ data:
   workhorse-config.toml.tpl: |
     shutdown_timeout = "61s"
     [redis]
-    URL = "redis://release-name-redis-master.default.svc:6379"
+    URL = "redis://release-name-redis-master.gitlab.svc:6379"
     Password = {% file.Read "/etc/gitlab/redis/redis-password" | strings.TrimSpace | data.ToJSON %}
     {%- $supported_providers := slice "AWS" "AzureRM" -%}
     {%- $provider := "" -%}
@@ -1897,7 +1897,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-webservice-tests
-  namespace: default
+  namespace: gitlab
 data:
   test_login: |
     set -e
@@ -1931,7 +1931,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-minio-config-cm
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -2166,7 +2166,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-custom-add-headers
-  namespace: default
+  namespace: gitlab
 data: 
   Referrer-Policy: strict-origin-when-cross-origin
 ---
@@ -2186,10 +2186,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-controller
-  namespace: default
+  namespace: gitlab
 data:
   allow-snippet-annotations: "false"
-  add-headers: default/release-name-nginx-ingress-custom-add-headers
+  add-headers: gitlab/release-name-nginx-ingress-custom-add-headers
     
   hsts: "true"
     
@@ -2218,7 +2218,7 @@ metadata:
     chart: prometheus-15.0.4
     heritage: Helm
   name: release-name-prometheus-server
-  namespace: default
+  namespace: gitlab
 data:
   alerting_rules.yml: |
     {}
@@ -2366,7 +2366,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-redis-scripts
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -2399,7 +2399,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-redis
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -2427,7 +2427,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-redis-health
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -2520,7 +2520,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-registry
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -2658,7 +2658,7 @@ data:
         accesskey: "ACCESS_KEY"
         secretkey: "SECRET_KEY"
         region: us-east-1
-        regionendpoint: http://release-name-minio-svc.default.svc:9000
+        regionendpoint: http://release-name-minio-svc.gitlab.svc:9000
         bucket: registry
         secure: true
         v4auth: true
@@ -2679,7 +2679,7 @@ data:
     redis:
       cache:
         enabled: false
-        addr: "release-name-redis-master.default.svc:6379"
+        addr: "release-name-redis-master.gitlab.svc:6379"
         password: "REDIS_CACHE_PASSWORD"
 
   # minimal configuration, in order to do database migrations
@@ -2695,7 +2695,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-chart-info
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -2711,7 +2711,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-postgresql-init-db
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -2734,7 +2734,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: release-name-minio
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -2761,7 +2761,7 @@ metadata:
     chart: prometheus-15.0.4
     heritage: Helm
   name: release-name-prometheus-server
-  namespace: default
+  namespace: gitlab
 spec:
   accessModes:
     - ReadWriteOnce
@@ -2775,7 +2775,7 @@ kind: CustomResourceDefinition
 metadata:
   name: certificaterequests.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -2814,7 +2814,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -3505,7 +3505,7 @@ kind: CustomResourceDefinition
 metadata:
   name: certificates.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -3544,7 +3544,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -4828,7 +4828,7 @@ kind: CustomResourceDefinition
 metadata:
   name: challenges.acme.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -4865,7 +4865,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -8706,7 +8706,7 @@ kind: CustomResourceDefinition
 metadata:
   name: clusterissuers.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -8742,7 +8742,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -13433,7 +13433,7 @@ kind: CustomResourceDefinition
 metadata:
   name: issuers.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -13469,7 +13469,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -18160,7 +18160,7 @@ kind: CustomResourceDefinition
 metadata:
   name: orders.acme.cert-manager.io
   annotations:
-    cert-manager.io/inject-ca-from-secret: 'default/release-name-certmanager-webhook-ca'
+    cert-manager.io/inject-ca-from-secret: 'gitlab/release-name-certmanager-webhook-ca'
   labels:
     app: 'certmanager'
     app.kubernetes.io/name: 'certmanager'
@@ -18197,7 +18197,7 @@ spec:
         #
         service:
           name: 'release-name-certmanager-webhook'
-          namespace: "default"
+          namespace: "gitlab"
           path: /convert
           #
   versions:
@@ -19351,7 +19351,7 @@ roleRef:
   name: release-name-certmanager-cainjector
 subjects:
   - name: release-name-certmanager-cainjector
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19373,7 +19373,7 @@ roleRef:
   name: release-name-certmanager-controller-issuers
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19395,7 +19395,7 @@ roleRef:
   name: release-name-certmanager-controller-clusterissuers
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19417,7 +19417,7 @@ roleRef:
   name: release-name-certmanager-controller-certificates
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19439,7 +19439,7 @@ roleRef:
   name: release-name-certmanager-controller-orders
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19461,7 +19461,7 @@ roleRef:
   name: release-name-certmanager-controller-challenges
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19483,7 +19483,7 @@ roleRef:
   name: release-name-certmanager-controller-ingress-shim
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19505,7 +19505,7 @@ roleRef:
   name: release-name-certmanager-controller-approve:cert-manager-io
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
@@ -19527,7 +19527,7 @@ roleRef:
   name: release-name-certmanager-controller-certificatesigningrequests
 subjects:
   - name: release-name-certmanager
-    namespace: "default"
+    namespace: "gitlab"
     kind: ServiceAccount
 ---
 # Source: gitlab/charts/certmanager/templates/webhook-rbac.yaml
@@ -19551,7 +19551,7 @@ subjects:
 - apiGroup: ""
   kind: ServiceAccount
   name: release-name-certmanager-webhook
-  namespace: default
+  namespace: gitlab
 ---
 # Source: gitlab/charts/nginx-ingress/templates/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -19575,7 +19575,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-nginx-ingress
-    namespace: "default"
+    namespace: "gitlab"
 ---
 # Source: gitlab/charts/prometheus/templates/server/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -19591,7 +19591,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: release-name-prometheus-server
-    namespace: default
+    namespace: gitlab
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -19671,7 +19671,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: release-name-certmanager-webhook:dynamic-serving
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: webhook
     app.kubernetes.io/name: webhook
@@ -19701,7 +19701,7 @@ metadata:
     chart: gitlab-runner-0.43.1
     release: "release-name"
     heritage: "Helm"
-  namespace: "default"
+  namespace: "gitlab"
 rules:
 - apiGroups: [""]
   resources: ["*"]
@@ -19723,7 +19723,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress
-  namespace: default
+  namespace: gitlab
 rules:
   - apiGroups:
       - ""
@@ -19818,7 +19818,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-certmanager-cainjector
-    namespace: default
+    namespace: gitlab
 ---
 # Source: gitlab/charts/certmanager/templates/rbac.yaml
 # grant cert-manager permission to manage the leaderelection configmap in the
@@ -19844,14 +19844,14 @@ subjects:
   - apiGroup: ""
     kind: ServiceAccount
     name: release-name-certmanager
-    namespace: default
+    namespace: gitlab
 ---
 # Source: gitlab/charts/certmanager/templates/webhook-rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: release-name-certmanager-webhook:dynamic-serving
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: webhook
     app.kubernetes.io/name: webhook
@@ -19868,7 +19868,7 @@ subjects:
 - apiGroup: ""
   kind: ServiceAccount
   name: release-name-certmanager-webhook
-  namespace: default
+  namespace: gitlab
 ---
 # Source: gitlab/charts/gitlab-runner/templates/role-binding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -19880,7 +19880,7 @@ metadata:
     chart: gitlab-runner-0.43.1
     release: "release-name"
     heritage: "Helm"
-  namespace: "default"
+  namespace: "gitlab"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: "Role"
@@ -19888,7 +19888,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: release-name-gitlab-runner
-  namespace: "default"
+  namespace: "gitlab"
 ---
 # Source: gitlab/charts/nginx-ingress/templates/controller-rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -19906,7 +19906,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress
-  namespace: default
+  namespace: gitlab
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -19914,14 +19914,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-nginx-ingress
-    namespace: "default"
+    namespace: "gitlab"
 ---
 # Source: gitlab/charts/certmanager/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: release-name-certmanager
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: certmanager
     app.kubernetes.io/name: certmanager
@@ -19947,7 +19947,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-certmanager-webhook
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: webhook
     app.kubernetes.io/name: webhook
@@ -19973,7 +19973,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-gitaly
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitaly
     chart: gitaly-6.3.3
@@ -20002,7 +20002,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-gitlab-exporter
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-exporter
     chart: gitlab-exporter-6.3.3
@@ -20028,7 +20028,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-gitlab-shell
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -20054,7 +20054,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -20092,7 +20092,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-webservice-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -20129,7 +20129,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: release-name-minio-svc
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -20171,7 +20171,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-controller-metrics
-  namespace: default
+  namespace: gitlab
 spec:
   type: ClusterIP
   ports:
@@ -20201,7 +20201,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-controller
-  namespace: default
+  namespace: gitlab
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
@@ -20306,7 +20306,7 @@ metadata:
     chart: prometheus-15.0.4
     heritage: Helm
   name: release-name-prometheus-server
-  namespace: default
+  namespace: gitlab
 spec:
   ports:
     - name: http
@@ -20325,7 +20325,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-redis-headless
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -20347,7 +20347,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-redis-metrics
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -20370,7 +20370,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-redis-master
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -20392,7 +20392,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: release-name-registry
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -20418,7 +20418,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-certmanager-cainjector
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: cainjector
     app.kubernetes.io/name: cainjector
@@ -20468,7 +20468,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-certmanager
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: certmanager
     app.kubernetes.io/name: certmanager
@@ -20526,7 +20526,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-certmanager-webhook
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: webhook
     app.kubernetes.io/name: webhook
@@ -20565,7 +20565,7 @@ spec:
           - --secure-port=10250
           - --dynamic-serving-ca-secret-namespace=$(POD_NAMESPACE)
           - --dynamic-serving-ca-secret-name=release-name-certmanager-webhook-ca
-          - --dynamic-serving-dns-names=release-name-certmanager-webhook,release-name-certmanager-webhook.default,release-name-certmanager-webhook.default.svc
+          - --dynamic-serving-dns-names=release-name-certmanager-webhook,release-name-certmanager-webhook.gitlab,release-name-certmanager-webhook.gitlab.svc
           ports:
           - name: https
             protocol: TCP
@@ -20603,7 +20603,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-gitlab-runner
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: release-name-gitlab-runner
     chart: gitlab-runner-0.43.1
@@ -20623,7 +20623,7 @@ spec:
         release: "release-name"
         heritage: "Helm"
       annotations:
-        checksum/configmap: 9e5870be887f3dd5558e1964f6e6b0243b87f693a08ed41e8584dd4a997247f5
+        checksum/configmap: 445d591e781aa6656a90047a0896381ae9de1bf47200bae0eb1296d9cf6abd21
         checksum/secrets: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         gitlab.com/prometheus_port: "9252"
         gitlab.com/prometheus_scrape: "true"
@@ -20661,7 +20661,7 @@ spec:
         - name: RUNNER_TAG_LIST
           value: ""
         - name: KUBERNETES_NAMESPACE
-          value: "default"
+          value: "gitlab"
         livenessProbe:
           exec:
             command: ["/bin/bash", "/configmaps/check-live"]
@@ -20718,7 +20718,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-gitlab-exporter
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-exporter
     chart: gitlab-exporter-6.3.3
@@ -20744,7 +20744,7 @@ spec:
         
         
       annotations:
-        checksum/config: 4f9858d20e99aedc9d858c0e50e11f3ed18e9d71912577a06c471f38b7bbafe1
+        checksum/config: 68e6d65e0239472b050a1a86f1386d156576ca41d8b9848860e090d5c7ffb97b
         gitlab.com/prometheus_scrape: "true"
         gitlab.com/prometheus_port: "9168"
         gitlab.com/prometheus_path: /metrics
@@ -20917,7 +20917,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-gitlab-shell
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -20942,8 +20942,8 @@ spec:
         
         
       annotations:
-        checksum/config: 0c11c321558d7e0ea78ce20f6446a6fb7018c2d1c3c580233b2cbb84b44933dc
-        checksum/config-sshd: 07885b91a4f54e750238ea330a81170a58ce9866692540e8b04b85b3d0ce2d59
+        checksum/config: 2dabf4884077c0e880a4d699aa2df81a8c03b765f8311cced80079d1d28dff39
+        checksum/config-sshd: e96c532ff374b8c661ca2106879b235a3796449e5bd785ae343d71b421f64b59
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       initContainers:
@@ -21093,7 +21093,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -21118,7 +21118,7 @@ spec:
         
         
       annotations:
-        checksum/config: cae08fded06ccfe98b7d47b13c04edbd9c589eee2fc553ef316ba646362e6b00
+        checksum/config: 9cbeeadddc84363d29f711d97630547d6c80a59f6c24426245c79475e78c606d
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         gitlab.com/prometheus_scrape: "true"
         gitlab.com/prometheus_port: "8151"
@@ -21245,7 +21245,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-sidekiq-all-in-1-v2
-  namespace: default
+  namespace: gitlab
   labels:
     app: sidekiq
     chart: sidekiq-6.3.3
@@ -21273,7 +21273,7 @@ spec:
         
         queue-pod-name: all-in-1
       annotations:
-        checksum/configmap: 823f5d68565333e000c5dfa19a88e7f067b3bf2ba6c2d6d18da3a815aabe597a
+        checksum/configmap: e73aeeb181c6f4400a12de3d967b99e68ca4c9cf17ee65bdf90bfc5ea217503c
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         gitlab.com/prometheus_scrape: "true"
         gitlab.com/prometheus_port: "3807"
@@ -21563,7 +21563,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-toolbox
-  namespace: default
+  namespace: gitlab
   labels:
     app: toolbox
     chart: toolbox-6.3.3
@@ -21591,7 +21591,7 @@ spec:
         
         
       annotations:
-        checksum/config: c2eacb5f09f10eb33fbe16768806a2f9963760eaa81cc0a49756ea7b6f6a3dbe
+        checksum/config: 66c3980d5357c1ca23b9add0502cbc68caa379988e5e99f911fba3d93dc010ca
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       securityContext:
@@ -21811,7 +21811,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-webservice-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -21843,7 +21843,7 @@ spec:
         
         
       annotations:
-        checksum/config: fdb18d19c2a9dcee0f6f6731e44f72e153cbe4fcc8869d105c8015cc0083b010
+        checksum/config: 03f95d977a8c8da1dc7fbc14c9d30bdc423ba85b8065baf572cbdc5704cbd310
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         gitlab.com/prometheus_scrape: "true"
         gitlab.com/prometheus_port: "8083"
@@ -22231,7 +22231,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-minio
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -22339,7 +22339,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/component: controller
   name: release-name-nginx-ingress-controller
-  namespace: default
+  namespace: gitlab
   annotations:
 spec:
   selector:
@@ -22375,7 +22375,7 @@ spec:
             - --controller-class=k8s.io/ingress-nginx
             - --configmap=$(POD_NAMESPACE)/release-name-nginx-ingress-controller
           
-            - --tcp-services-configmap=default/release-name-nginx-ingress-tcp
+            - --tcp-services-configmap=gitlab/release-name-nginx-ingress-tcp
             - --watch-namespace=$(POD_NAMESPACE)
           securityContext:
             capabilities:
@@ -22447,7 +22447,7 @@ metadata:
     chart: prometheus-15.0.4
     heritage: Helm
   name: release-name-prometheus-server
-  namespace: default
+  namespace: gitlab
 spec:
   selector:
     matchLabels:
@@ -22544,7 +22544,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: release-name-registry
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -22570,7 +22570,7 @@ spec:
         
         
       annotations:
-        checksum/configmap: 8221adfcf19671cba72a8d34f65b859ac2b97aff9c8b330450c44c340df8a407
+        checksum/configmap: bd0c39602c5ca3ceb8097c1c5041d9e095eddce46a4042b85677971cffbb84f4
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       
@@ -22703,7 +22703,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: release-name-gitlab-shell
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab-shell
     chart: gitlab-shell-6.3.3
@@ -22728,7 +22728,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -22753,7 +22753,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: release-name-sidekiq-all-in-1-v2
-  namespace: default
+  namespace: gitlab
   labels:
     app: sidekiq
     chart: sidekiq-6.3.3
@@ -22778,7 +22778,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: release-name-webservice-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -22804,7 +22804,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: release-name-registry
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -22829,7 +22829,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: release-name-gitaly
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitaly
     chart: gitaly-6.3.3
@@ -22855,7 +22855,7 @@ spec:
         
         
       annotations:
-        checksum/config: 33940e7678377f535fed616706066a1553b84e393fa5429a17b4a5a96d427d77
+        checksum/config: 2f423283b7575d6ebe158a7f7fc697aa9b2aa96ffaa5bc6654033a7f544611c5
         gitlab.com/prometheus_scrape: "true"
         gitlab.com/prometheus_port: "9236"
         gitlab.com/prometheus_path: /metrics
@@ -23184,7 +23184,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: release-name-redis-master
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: redis
     chart: redis-11.3.4
@@ -23205,8 +23205,8 @@ spec:
         release: release-name
         role: master
       annotations:
-        checksum/health: c356601f841644e6b25f6469f281209d7aa0400a7aa6469b3b6c5e83a515767f
-        checksum/configmap: b6d1c59dd0e7a26d579e1e3e3cb7d3e3a836e092e81c36bc3cd5ccd5d806e9f4
+        checksum/health: 0de78e1f5f0356e4305b0e6154b33de2c0f6e227f82aac63b0f97068bfd993e2
+        checksum/configmap: a3f325217ffddfdda818863eaff128774814c1769ae7a46bace26de9703efb10
         checksum/secret: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
         prometheus.io/port: "9121"
         prometheus.io/scrape: "true"
@@ -23342,7 +23342,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: release-name-migrations-1
-  namespace: default
+  namespace: gitlab
   labels:
     app: migrations
     chart: migrations-6.3.3
@@ -23510,7 +23510,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: release-name-minio-create-buckets-1
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -23548,7 +23548,7 @@ spec:
         command: ["/bin/sh", "/config/initialize"]
         env:
           - name: MINIO_ENDPOINT
-            value: release-name-minio-svc.default.svc
+            value: release-name-minio-svc.gitlab.svc
           - name: MINIO_PORT
             value: "9000"
         volumeMounts:
@@ -23584,7 +23584,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: release-name-kas
-  namespace: default
+  namespace: gitlab
   labels:
     app: kas
     chart: kas-6.3.3
@@ -23621,7 +23621,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: release-name-webservice-default
-  namespace: default
+  namespace: gitlab
   labels:
     app: webservice
     chart: webservice-6.3.3
@@ -23657,7 +23657,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: release-name-minio
-  namespace: default
+  namespace: gitlab
   labels:
     app: minio
     chart: minio-0.4.3
@@ -23692,7 +23692,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: release-name-registry
-  namespace: default
+  namespace: gitlab
   labels:
     app: registry
     chart: registry-0.7.0
@@ -23736,7 +23736,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     helm.sh/chart: certmanager-v1.5.4
   annotations:
-    cert-manager.io/inject-ca-from-secret: "default/release-name-certmanager-webhook-ca"
+    cert-manager.io/inject-ca-from-secret: "gitlab/release-name-certmanager-webhook-ca"
 webhooks:
   - name: webhook.cert-manager.io
     rules:
@@ -23770,7 +23770,7 @@ webhooks:
     clientConfig:
       service:
         name: release-name-certmanager-webhook
-        namespace: "default"
+        namespace: "gitlab"
         path: /mutate
 ---
 # Source: gitlab/charts/certmanager/templates/webhook-validating-webhook.yaml
@@ -23787,7 +23787,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     helm.sh/chart: certmanager-v1.5.4
   annotations:
-    cert-manager.io/inject-ca-from-secret: "default/release-name-certmanager-webhook-ca"
+    cert-manager.io/inject-ca-from-secret: "gitlab/release-name-certmanager-webhook-ca"
 webhooks:
   - name: webhook.cert-manager.io
     namespaceSelector:
@@ -23799,7 +23799,7 @@ webhooks:
       - key: "name"
         operator: "NotIn"
         values:
-        - default
+        - gitlab
     rules:
       - apiGroups:
           - "cert-manager.io"
@@ -23830,7 +23830,7 @@ webhooks:
     clientConfig:
       service:
         name: release-name-certmanager-webhook
-        namespace: "default"
+        namespace: "gitlab"
         path: /validate
 ---
 # Source: gitlab/charts/certmanager/templates/startupapicheck-serviceaccount.yaml
@@ -23839,7 +23839,7 @@ kind: ServiceAccount
 automountServiceAccountToken: true
 metadata:
   name: release-name-certmanager-startupapicheck
-  namespace: "default"
+  namespace: "gitlab"
   annotations:
     helm.sh/hook: post-install
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
@@ -23858,7 +23858,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: release-name-shared-secrets
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -23875,7 +23875,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-shared-secrets
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -23890,7 +23890,7 @@ data:
   generate-secrets: |
     # vim: set filetype=sh:
     
-    namespace=default
+    namespace=gitlab
     release=release-name
     env=production
     
@@ -24070,7 +24070,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: release-name-gitlab-upgrade-check
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -24166,7 +24166,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: release-name-certmanager-startupapicheck:create-cert
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: startupapicheck
     app.kubernetes.io/name: startupapicheck
@@ -24189,7 +24189,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: release-name-shared-secrets
-  namespace: default
+  namespace: gitlab
   labels:
     app: shared-secrets
     chart: shared-secrets-6.3.3
@@ -24210,7 +24210,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: release-name-certmanager-startupapicheck:create-cert
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: startupapicheck
     app.kubernetes.io/name: startupapicheck
@@ -24230,14 +24230,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-certmanager-startupapicheck
-    namespace: default
+    namespace: gitlab
 ---
 # Source: gitlab/templates/shared-secrets/rbac-config.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: release-name-shared-secrets
-  namespace: default
+  namespace: gitlab
   labels:
     app: shared-secrets
     chart: shared-secrets-6.3.3
@@ -24255,14 +24255,14 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: release-name-shared-secrets
-    namespace: default
+    namespace: gitlab
 ---
 # Source: gitlab/charts/gitlab/charts/webservice/templates/tests/test-runner.yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: release-name-webservice-test-runner-g8d2b
-  namespace: default
+  name: release-name-webservice-test-runner-dhluh
+  namespace: gitlab
   annotations:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
@@ -24295,7 +24295,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: release-name-certmanager-startupapicheck
-  namespace: "default"
+  namespace: "gitlab"
   labels:
     app: startupapicheck
     app.kubernetes.io/name: startupapicheck
@@ -24340,8 +24340,8 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: release-name-shared-secrets-1-qnp
-  namespace: default
+  name: release-name-shared-secrets-1-vmv
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
@@ -24394,7 +24394,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: release-name-gitlab-upgrade-check
-  namespace: default
+  namespace: gitlab
   labels:
     app: gitlab
     chart: gitlab-6.3.3
