@@ -1,0 +1,58 @@
+gitlab:
+  gitaly:
+    persistence:
+      storageClass: hostpath
+      size: 20Gi
+postgresql:
+  persistence:
+    storageClass: hostpath
+    size: 8Gi
+minio:
+  persistence:
+    storageClass: hostpath
+    size: 10Gi
+prometheus:
+  persistence:
+    storageClass: hostpath
+    size: 10Gi
+redis:
+  master:
+    persistence:
+      storageClass: hostpath
+      size: 5Gi
+
+# Addtional config
+global:
+  common:
+    labels: {}
+##Host
+  hosts:
+      domain: localhost
+      hostSuffix:
+      https: true
+      externalIP:
+      ssh: ~
+      gitlab: {}
+      minio: {}
+      registry: {}
+      tls: true
+      smartcard: {}
+      kas: {}
+      pages: {}
+
+  #Ingress
+  ingress:
+      apiVersion: ""
+      configureCertmanager: false
+      provider: nginx
+      # class:
+      annotations: {}
+      enabled: true
+      tls: 
+        enabled: true
+        secretName: gitlab-tls
+      path: /
+      pathType: Prefix
+
+  certmanager:
+    install: true
