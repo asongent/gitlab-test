@@ -13,8 +13,8 @@ spec:
     helm:
       valueFiles:
       - values.yaml
-    repoURL: https://gitlab.com/gitlab-org/charts/gitlab
-    targetRevision:  0.1.0
+    repoURL: https://charts.gitlab.io/  #https://gitlab.com/gitlab-org/charts/gitlab
+    targetRevision:  6.3.3
 
 # ---
 # apiVersion: argoproj.io/v1alpha1
