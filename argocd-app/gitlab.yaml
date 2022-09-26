@@ -24,12 +24,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: git-runner
+  name: gitlab-runner
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/lwolf/gitlab-chart.git
+    repoURL: https://github.com/asongent/gitlab-test.git
     targetRevision: HEAD
     path: gitlab-runner
   destination:
@@ -49,7 +49,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/lwolf/gitlab-chart.git
+    repoURL: https://github.com/asongent/gitlab-test.git
     targetRevision: HEAD
     path: gitlab
   destination:
@@ -68,9 +68,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/lwolf/gitlab-chart.git
+    repoURL: https://github.com/asongent/gitlab-test.git
     targetRevision: HEAD
-    path: inress
+    path: ingress
   destination:
     server: https://kubernetes.default.svc
   syncPolicy:
@@ -87,7 +87,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/lwolf/gitlab-chart.git
+    repoURL: https://github.com/asongent/gitlab-test.git
     targetRevision: HEAD
     path: minio
   destination:
