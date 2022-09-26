@@ -1,17 +1,95 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: gritlab
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/asongent/gitlab-test.git
+#     targetRevision: HEAD
+#     path: gitlab
+#     helm:
+#       valueFiles:
+#       - values.yaml
+#   destination:
+#     namespace: gitlab
+#     server: https://kubernetes.default.svc
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gritlab
+  name: git-runner
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/asongent/gitlab-test.git
+    repoURL: https://github.com/lwolf/gitlab-chart.git
+    targetRevision: HEAD
+    path: gitlab-runner
+  destination:
+    namespace: gitlab
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+--- 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lwolf/gitlab-chart.git
     targetRevision: HEAD
     path: gitlab
-    helm:
-      valueFiles:
-      - values.yaml
+  destination:
+    namespace: gitlab
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+--- 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lwolf/gitlab-chart.git
+    targetRevision: HEAD
+    path: inress
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+--- 
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lwolf/gitlab-chart.git
+    targetRevision: HEAD
+    path: minio
   destination:
     namespace: gitlab
     server: https://kubernetes.default.svc
