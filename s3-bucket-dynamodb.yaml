@@ -1,0 +1,168 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: This stack will create a DynamoDB Table and S3 Bucket for terraform state
+
+Parameters:
+  BucketName:   { Type: String, Default: "fhcl-state-bucket-2023" }
+  DynamoDBName: { Type: String, Default: "fhcl-dynamoDB" }
+  BSName:       { Type: String, Default: "fhcl-bastion-host" }
+  ImageId:      { Type: String, Default: "ami-00712dae9a53f8c15" }    
+  InstanceType: { Type: String, Default: "t3.large" }   
+  KeyName:      { Type: String, Default: "vault-server-key" } 
+  SubnetId:     { Type: String, Default: "subnet-5d0ba800" }
+  SGID:         { Type: String, Default: " sg-03a645ec463c6b9f2" }
+  SGName:       { Type: String, Default: "kops-sg" }
+  AZ:           { Type: String, Default: "us-west-2c" }
+ 
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Ref AZ
+      NetworkInterfaces:
+        - DeviceIndex: "0"
+          AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          SubnetId: !Ref SubnetId
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      BlockDeviceMappings:
+      -
+        DeviceName: /dev/sda1
+        Ebs:
+          VolumeSize: 100
+      -
+        DeviceName: /dev/sdm
+        Ebs:
+          VolumeSize: 100
+      # SecurityGroupIds: 
+      #  - !Ref SGName
+      # SecurityGroups: 
+      #   - !Ref SGID
+      KeyName: !Ref 'KeyName'
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          sudo apt-get update -y
+          sudo apt install git curl wget -y
+      
+          curl -LO https://dl.k8s.io/release/v1.26.0/bin/linux/amd64/kubectl
+          chmod +x kubectl
+          mv kubectl /usr/bin/
+        
+          wget -qO- https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.7/kustomize_v4.5.7_linux_amd64.tar.gz | tar -xvzf - 
+          mv kustomize /usr/bin
+
+          sudo apt-get update -y
+          wget https://github.com/mozilla/sops/releases/download/v3.7.3/sops_3.7.3_amd64.deb 
+          sudo apt install ./sops_3.7.3_amd64.deb
+          rm sops_3.7.3_amd64.deb  -rf 
+           
+          mkdir  -p ~/.config/kustomize/plugin/viaduct.ai/v1/ksops/
+          wget https://github.com/viaduct-ai/kustomize-sops/releases/download/v2.4.0/ksops_2.4.0_Linux_x86_64.tar.gz  
+          tar -xvzf ksops_2.4.0_Linux_x86_64.tar.gz 
+          mv ksops ~/.config/kustomize/plugin/viaduct.ai/v1/ksops/
+          rm -rf ksops_2.4.0_Linux_x86_64.tar.gz LICENSE  README.md
+         
+         
+### DynamoDB Table
+  DynamoDBTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "Album"
+          AttributeType: "S"
+        - 
+          AttributeName: "Artist"
+          AttributeType: "S"
+        - 
+          AttributeName: "Sales"
+          AttributeType: "N"
+        - 
+          AttributeName: "NumberOfSongs"
+          AttributeType: "N"
+      KeySchema: 
+        - 
+          AttributeName: "Album"
+          KeyType: "HASH"
+        - 
+          AttributeName: "Artist"
+          KeyType: "RANGE"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: !Ref  DynamoDBName
+      GlobalSecondaryIndexes: 
+        - 
+          IndexName: "FHCLGSI"
+          KeySchema: 
+            - 
+              AttributeName: "Sales"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Artist"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Album"
+              - "NumberOfSongs"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
+        - 
+          IndexName: "FHCLGSI2"
+          KeySchema: 
+            - 
+              AttributeName: "NumberOfSongs"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Sales"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Album"
+              - "Artist"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
+      LocalSecondaryIndexes: 
+        - 
+          IndexName: "FHCLLSI"
+          KeySchema: 
+            - 
+              AttributeName: "Album"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Sales"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Artist"
+              - "NumberOfSongs"
+            ProjectionType: "INCLUDE"
+  
+
+# sudo certbot certonly --manual -d vault.fredgentech.com -d fredgentech.com --agree-tos \
+# --preferred-challenges dns-01 --server https://acme-v02.api.letsencrypt.org/directory \
+# --email=asongentle@gmail.com --rsa-key-size 4096
+
+# sudo chown ec2-user:ec2-user /usr/bin/certbot -R
+# sudo chown ec2-user:ec2-user /var/log/letsencrypt/ -R
+# sudo chown ec2-user:ec2-user  /etc/letsencrypt/live/vault.fredgentech.com/ -R
+# sudo chmod +x /etc/letsencrypt/vault.fredgentech.com/
+# sudo chmod +x /etc/letsencrypt/archive
+# sudo chown ec2-user:ec2-user /etc/letsencrypt/live -R
+# sudo chown ec2-user:ec2-user ../../archive/vault.fredgentech.com/privkey1.pem* -R
